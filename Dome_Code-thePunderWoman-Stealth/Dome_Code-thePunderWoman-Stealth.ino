@@ -27,7 +27,6 @@ int i2cCommand = 0;
 #define REAR_PSI 23
 #define ASTROPIXELS 10
 #define HPS 25
-#define VOCALIZER 30
 
 unsigned long loopTime; // Time variable
 
@@ -200,8 +199,9 @@ void OpenClosePies() {  // Note: This may seem backwards but the Close command (
       Servos[PP6].attach(PP6_SERVO_PIN,PANEL_MIN,PANEL_MAX);
       // Servos[DT].attach(DT_SERVO_PIN,PANEL_MIN,PANEL_MAX);
 
+      sendToBody(7); // Play happy vocalization
       sendI2C(STEALTH, "$02", true); // sends an I2C command to Stealth folder two (chat sounds)
-      
+
       //closes panels, "true" statement allows servo to reach position before executing next .write
       Servos[PP1].write(PANEL_CLOSE,SPEED,true); // the "true" uses servo postion to ensure full position prior to next .write line. Good for smooth sequence verses delays
       Servos[PP2].write(PANEL_CLOSE,SPEED,true);
@@ -232,39 +232,34 @@ void OpenClosePies() {  // Note: This may seem backwards but the Close command (
       Servos[PP6].attach(PP6_SERVO_PIN,PANEL_MIN,PANEL_MAX);
       // Servos[DT].attach(DT_SERVO_PIN,PANEL_MIN,PANEL_MAX);
 
+      sendToBody(7); // Play happy vocalization
       sendI2C(STEALTH, "$01", true);  // Stealth sound folder one (general sounds)
-      
-       // This is a "for" loop, see Arduino site for ref.  Basically it allows you to repeat things between {curly braces} as many times as you want
-       for (int i=0; i<2; i++) {   //Loop 2 times (i<2;)Increase or decrease number to change looped times
- 
-     
-       // open pies in wave
-       
-       Servos[PP2].write(PANEL_OPEN,FASTSPEED,true);
-       Servos[PP1].write(PANEL_OPEN,FASTSPEED,true);
-       Servos[PP6].write(PANEL_OPEN,FASTSPEED,true);
-       Servos[PP5].write(PANEL_OPEN,FASTSPEED,true);
-      //  Servos[DT].write(PANEL_OPEN,FASTSPEED,true);
-       
-       // close pies in opposite wave
-       
-       Servos[PP5].write(PANEL_CLOSE,FASTSPEED,true);
-       Servos[PP6].write(PANEL_CLOSE,FASTSPEED,true);
-       Servos[PP1].write(PANEL_CLOSE,FASTSPEED,true);
-       Servos[PP2].write(PANEL_CLOSE,FASTSPEED,true);
-      //  Servos[DT].write(PANEL_CLOSE,FASTSPEED,true);
 
-        
+      for (int i=0; i<2; i++) { 
+        // open pies in wave
+       
+        Servos[PP2].write(PANEL_OPEN,FASTSPEED,true);
+        Servos[PP1].write(PANEL_OPEN,FASTSPEED,true);
+        Servos[PP6].write(PANEL_OPEN,FASTSPEED,true);
+        Servos[PP5].write(PANEL_OPEN,FASTSPEED,true);
+  
+        //  Servos[DT].write(PANEL_OPEN,FASTSPEED,true);
+       
+        // close pies in opposite wave
+       
+        Servos[PP5].write(PANEL_CLOSE,FASTSPEED,true);
+        Servos[PP6].write(PANEL_CLOSE,FASTSPEED,true);
+        Servos[PP1].write(PANEL_CLOSE,FASTSPEED,true);
+        Servos[PP2].write(PANEL_CLOSE,FASTSPEED,true);
+        //  Servos[DT].write(PANEL_CLOSE,FASTSPEED,true);
 
-       // reopen pies
-       Servos[PP2].write(PANEL_OPEN,FASTSPEED,true);
-       Servos[PP1].write(PANEL_OPEN,FASTSPEED,true);
-       Servos[PP6].write(PANEL_OPEN,FASTSPEED,true);
-       Servos[PP5].write(PANEL_OPEN,FASTSPEED,true);
-      //  Servos[DT].write(PANEL_OPEN,FASTSPEED,true);
-   
-       }
-
+        // reopen pies
+        Servos[PP2].write(PANEL_OPEN,FASTSPEED,true);
+        Servos[PP1].write(PANEL_OPEN,FASTSPEED,true);
+        Servos[PP6].write(PANEL_OPEN,FASTSPEED,true);
+        Servos[PP5].write(PANEL_OPEN,FASTSPEED,true);
+        //  Servos[DT].write(PANEL_OPEN,FASTSPEED,true);
+      }
 
       delay(1000);
       // .detach disables servos      
@@ -308,6 +303,7 @@ void OpenCloseLow() {
       Servos[P11].attach(P11_SERVO_PIN,PANEL_MIN,PANEL_MAX);
       Servos[P13].attach(P13_SERVO_PIN,PANEL_MIN,PANEL_MAX);
 
+      sendToBody(7); // Play happy vocalization
       sendI2C(STEALTH, "$02", true); //plays random sound in specified soundbank folder 
 
       Servos[P4].write(PANEL_CLOSE,SPEED,true);
@@ -350,10 +346,11 @@ void OpenCloseLow() {
       Servos[P11].attach(P11_SERVO_PIN);
       Servos[P13].attach(P13_SERVO_PIN);
       
-      sendI2C(STEALTH, "$02", true);
+      sendToBody(7); // Play happy vocalization
+      sendI2C(STEALTH, "$02", true); //plays random sound in specified soundbank folder 
 
        // Wave these panels in order specified below using "for" loop to repeat
-      for (int i=0; i<2; i++) {   //Loop x number of times (2 times in this case)
+      for (int i=0; i<2; i++) { 
 
         // P1,(P11,P13,P10) P2,P3,P4,P7
         // open
@@ -367,7 +364,7 @@ void OpenCloseLow() {
         Servos[P7].write(PANEL_OPEN,SPEED,true); 
       
         // P7,P4,P3,P2,P1,P11,P13,P10
-      //close
+        //close
         Servos[P7].write(PANEL_CLOSE,SPEED,true);
         Servos[P4].write(PANEL_CLOSE,SPEED,true);
         Servos[P3].write(PANEL_CLOSE,SPEED,true);
@@ -378,8 +375,7 @@ void OpenCloseLow() {
         Servos[P13].write(PANEL_CLOSE,SPEED,true);
         delay(50); // used delay to panel for better flow
         Servos[P10].write(PANEL_CLOSE,SPEED,true);
-     }   // end "for" loop
-
+      }
 
       // write open
       Servos[P10].write(PANEL_OPEN,FASTSPEED,true);
@@ -423,9 +419,10 @@ void OpenCloseAll () {
       Serial.println("Closing");
       AllOpen=false;     
 
+      sendToBody(7); // Play happy vocalization
       sendI2C(STEALTH, "$02", true); // I2C to Stealth for soundbank 2, chat
-      
-     //  Attach, write servo (min, max) range to ensure each panel opens and closes properly 
+
+      //  Attach, write servo (min, max) range to ensure each panel opens and closes properly 
 
       Servos[PP1].attach(PP1_SERVO_PIN,PANEL_MIN,PANEL_MAX);
       Servos[PP2].attach(PP2_SERVO_PIN,PANEL_MIN,PANEL_MAX);
@@ -499,8 +496,9 @@ void OpenCloseAll () {
       Servos[P11].attach(P11_SERVO_PIN,PANEL_MIN,PANEL_MAX);
       Servos[P13].attach(P13_SERVO_PIN,PANEL_MIN,PANEL_MAX);
 
-      sendI2C(STEALTH, "$02", true); // sound bank folder
-      
+      sendToBody(7);
+      sendI2C(STEALTH, "$02", true); // I2C to Stealth for soundbank 2, chat
+
       //Write Pies open
       Servos[PP2].write(PANEL_OPEN,SPEED,true);
       Servos[PP5].write(PANEL_OPEN,SPEED,true);
@@ -570,14 +568,32 @@ void scream() {
   digitalWrite(STATUS_LED, HIGH); // turn on STATUS LED so we can visually see we got the command on the board     
   Serial.print("Scream Sequence: Start");
 
-  sendI2C(HPS, "D007C\r", false);
+  sendI2C(HPS, "A007C\r", false);
+  sendI2C(HPS, "X105\r", false);
+  sendI2C(HPS, "T106\r", false);
   sendI2C(FRONT_PSI, "4T5\r", false);
   sendI2C(REAR_PSI, "5T5\r", false);
   sendI2C(ASTROPIXELS, "@0T4\r", false);
   sendToBody(5);
-  sendI2C(VOCALIZER, "<PVA75,CA0010C0011>\r", false);
+  sendI2C(STEALTH, "$02", true); // I2C to Stealth for soundbank 2, chat
+  //TODO: Switch this back to using the proper scream sound bank
 
   Serial.println("Scream Sequence: Complete");
+  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
+  digitalWrite(STATUS_LED, LOW); 
+}
+
+void overload() {
+  digitalWrite(STATUS_LED, HIGH); // turn on STATUS LED so we can visually see we got the command on the board     
+  Serial.print("Overload Sequence: Start");
+
+  sendI2C(HPS, "A007C\r", false);
+  sendI2C(FRONT_PSI, "4T4\r", false);
+  sendI2C(REAR_PSI, "5T4\r", false);
+  sendI2C(ASTROPIXELS, "@0T4\r", false);
+  sendToBody(11);
+
+  Serial.println("Overload Sequence: Complete");
   i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW); 
 }
@@ -586,7 +602,7 @@ void heart() {
   digitalWrite(STATUS_LED, HIGH); // turn on STATUS LED so we can visually see we got the command on the board     
   Serial.print("Heart: Start");
 
-  sendI2C(HPS, "A007|10\r", false);
+  sendI2C(HPS, "A006|10\r", false);
   sendI2C(FRONT_PSI, "4T7\r", false);
   sendI2C(ASTROPIXELS, "@1MYou're\rWonderful", false);
 
@@ -616,31 +632,13 @@ void leiaMode() {
   sendI2C(REAR_PSI, "5T6|36\r", false);
   sendI2C(ASTROPIXELS, "@0T6\r", false);
   sendToBody(6);
-  sendI2C(VOCALIZER, "<CA0000>\r", false);
   sendI2C(STEALTH, "$14", true); // play Leia Long sequence
   sendI2C(STEALTH, "tmprnd=40", true); // temporarily disable random sounds
   delay(500);
-  // TODO: Wait until complete and re-enable random sounds
 
   Serial.println("Leia Sequence: Complete");
   i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
-}
-
-void happyVocalization() {
-  sendI2C(VOCALIZER, "<SH0>\r", false);
-  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
-}
-
-void museVocalization() {
-  sendI2C(VOCALIZER, "<MM>\r", false);
-  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
-}
-
-void resetVocalizer() {
-  sendI2C(VOCALIZER, "<PSV,M1,MN10,MX30,PVV50,PVA50,PVB50>\r", false);
-  Serial.print("Vocalizer Muse Enabled");  
-  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
 }
 
 void resetHolos() {
@@ -732,7 +730,6 @@ void resetAll() {
   resetHolos();
   resetLogics();
   resetPSIs();
-  resetVocalizer();
   resetBody();
 
   i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
@@ -783,14 +780,6 @@ void loop() {
 
    case 7:
           helloThere();  // can be used to test other device code commands such as holos, magic panel etc.
-          break;
-   
-   case 8:
-          museVocalization();
-          break;
-
-   case 9:
-          happyVocalization();
           break;
 
    case 10:

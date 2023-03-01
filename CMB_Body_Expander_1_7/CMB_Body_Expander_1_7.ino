@@ -17,6 +17,7 @@
 #include <LedControl.h>
 #include <Wire.h>
 #include "config.h"
+#include <hcr.h>
 
 float vout = 0.0;       // for voltage out measured analog input
 int value = 0;          // used to hold the analog value coming out of the voltage divider
@@ -24,6 +25,11 @@ float vin = 0.0;        // voltage calculated... since the divider allows for 15
 
 //Incoming I2C Command
 int I2CCommand = 0;
+
+int voiceVolume = 99;
+int chaVolume = 50;
+int chbVolume = 50;
+bool muted = false;
 
 unsigned long loopTime; // Time variable
 
@@ -41,10 +47,10 @@ bool cbi_dataOpen = false;
 // Instantiate LedControl driver
 LedControl lc = LedControl(DATAIN_PIN, CLOCK_PIN, LOAD_PIN, NUMDEV);
 
+HCRVocalizer HCR(0x1E,Wire);
 
 void setup()
 {
-
   // Setup the Serial for debug and command input
   // initialize suart used to communicate with the JEDI Display at 2400 or 9600 bauds
   // This is set in config.h
@@ -97,13 +103,17 @@ void setup()
 
   DEBUG_PRINT(F("Activating Servos"));
   resetServos();
+  
+  // waitTime(3000);
+  HCR.begin();
 
-  DEBUG_PRINT_LN(F(""));
+  // Disable Emotion Override
+  resetVocalizer();
+  
+  DEBUG_PRINT_LN(F("Setup Complete"));
 }
 
-
 void loop() {
-
   if (digitalRead(CBI_SWITCH_PIN) == LOW)
   {
     lc.shutdown(CBI, true);
@@ -133,9 +143,151 @@ void loop() {
 #ifndef BLUELEDTRACKGRAPH
   updateBlueLEDs();
 #endif
+  doCommand();
+}
 
-    doCommand();
+//----------------------------------------------------------------------------
+//  Vocalizer Commands
+//----------------------------------------------------------------------------
 
+void playScream() {
+  HCR.PlayWAV(CH_A, "0010C0011");
+}
+
+void playLeia() {
+  sendI2C(30, "<CA0000>\r", false);
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  // HCR.PlayWAV(CH_A, "0000");
+}
+
+void playVader() {
+  HCR.PlayWAV(CH_A, "0002");
+}
+
+void playCantina() {
+  HCR.PlayWAV(CH_A, "0003");
+}
+
+void playSWTheme() {
+  HCR.PlayWAV(CH_A, "0001");
+}
+
+// Emote Events
+
+void enableMuse() {
+  sendI2C(30, "<PSG,M1,MN10,MX30>\r", false);
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+}
+
+void disableMuse() {
+  sendI2C(30, "<PSG,M0>\r", false);
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+}
+
+void resetVocalizer() {
+  DEBUG_PRINT_LN(F("RESETTING VOCALIZER"));
+  HCR.ResetEmotions();
+  HCR.StopEmote();
+  HCR.StopWAV(CH_A);
+  HCR.StopWAV(CH_B);
+  sendI2C(30, "<PVV99,PVA50,PVB50>\r", false);
+  // toggleMute();
+  enableMuse();
+  enableMuse();
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+}
+
+void toggleMute() {
+  if (muted) {
+    DEBUG_PRINT_LN(F("UNMUTING"));
+    sendI2C(30, "<PVV99,PVA50,PVB50>\r", false);
+    // HCR.SetVolume(CH_V, voiceVolume);
+    // HCR.SetVolume(CH_A, chaVolume);
+    // HCR.SetVolume(CH_B, chbVolume);
+    muted = false;
+  } else {
+    DEBUG_PRINT_LN(F("MUTING"));
+    sendI2C(30, "<PVV0,PVA0,PVB0>\r", false);
+    // HCR.SetVolume(CH_V, 0);
+    // HCR.SetVolume(CH_A, 0);
+    // HCR.SetVolume(CH_B, 0);
+    muted = true;
+  }
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+}
+
+void sadEmote(int level = EMOTE_MODERATE) {
+  HCR.Stimulate(SAD, level);
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+}
+
+void happyEmote(int level = EMOTE_MODERATE) {
+  HCR.Stimulate(HAPPY, level);
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+}
+
+void madEmote(int level = EMOTE_MODERATE) {
+  HCR.Stimulate(MAD, level);
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+}
+
+void scaredEmote(int level = EMOTE_MODERATE) {
+  HCR.Stimulate(SCARED, level);
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+}
+
+void overloadEmote() {
+  sendI2C(30, "<SE>\r", false);
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+}
+
+// TODO: Add double click functionality to make the Emote level strong
+// TODO: Pause emotes while playing
+
+// Events
+void Leia() {
+  digitalWrite(STATUS_LED, HIGH);
+
+  disableMuse();
+  HCR.StopEmote();
+  playLeia();
+  waitTime(36000); // wait until Leia is done to re-enable
+  enableMuse();
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  digitalWrite(STATUS_LED, LOW);
+}
+
+void Vader() {
+  digitalWrite(STATUS_LED, HIGH);
+
+  playVader();
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  digitalWrite(STATUS_LED, LOW);
+}
+
+void Theme() {
+  digitalWrite(STATUS_LED, HIGH);
+
+  playSWTheme();
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  digitalWrite(STATUS_LED, LOW);
+}
+
+void Cantina() {
+  digitalWrite(STATUS_LED, HIGH);
+
+  playCantina();
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  digitalWrite(STATUS_LED, LOW);
+}
+
+void overload() {
+  digitalWrite(STATUS_LED, HIGH);
+  // TODO: add servo functionality
+
+  overloadEmote();
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  digitalWrite(STATUS_LED, LOW);
 }
 
 //----------------------------------------------------------------------------
@@ -170,7 +322,7 @@ void resetServos() {
   digitalWrite(DP_SWITCH_PIN, LOW);
   digitalWrite(VM_SWITCH_PIN, LOW);
 
-  waitTime(1000); // wait on servos
+  waitTime(600); // wait on servos
 
   // Detach from the servo to save power and reduce jitter
   Servos[TOP_UTIL_ARM].detach();
@@ -244,7 +396,6 @@ void openEverything() {
     utilityArmOpen = true;
     topUtilityArmOpen = true;
     bottomUtilityArmOpen = true;
-
   }
 
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
@@ -322,7 +473,6 @@ void UtilityArms() {
 
     Servos[TOP_UTIL_ARM].detach(); // detach so we can move the arms freely
     Servos[BOTTOM_UTIL_ARM].detach();
-
   }
 
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
@@ -442,6 +592,7 @@ void Scream() {
 
   digitalWrite(STATUS_LED, HIGH);
 
+  playScream();
   Servos[TOP_UTIL_ARM].attach(TOP_UTIL_ARM_SERVO_PIN, ARMMINPULSE, ARMMAXPULSE);
   Servos[BOTTOM_UTIL_ARM].attach(BOTTOM_UTIL_ARM_SERVO_PIN, ARMMINPULSE, ARMMAXPULSE);
   Servos[LEFT_DOOR].attach(LEFT_DOOR_SERVO_PIN, LEFT_DOOR_MINPULSE, LEFT_DOOR_MAXPULSE);
@@ -507,8 +658,6 @@ void Scream() {
 
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
-
-
 }
 
 //-----------------------------------------------------
@@ -761,31 +910,6 @@ void openCBI_DataDoor() {
 
 }
 
-void Vader() {
-  digitalWrite(STATUS_LED, HIGH);
-
-  sendI2C(30, "<CA0002>\r", false);
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
-  digitalWrite(STATUS_LED, LOW);
-}
-
-void Theme() {
-  digitalWrite(STATUS_LED, HIGH);
-
-  sendI2C(30, "<CA0001>\r", false);
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
-  digitalWrite(STATUS_LED, LOW);
-}
-
-void Cantina() {
-  digitalWrite(STATUS_LED, HIGH);
-
-  sendI2C(30, "<CA0003>\r", false);
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
-  digitalWrite(STATUS_LED, LOW);
-}
-
-
 //----------------------------------------------------------------------------
 //  Delay function
 //----------------------------------------------------------------------------
@@ -852,6 +976,7 @@ void doCommand() {
     case 1: // RESET
       DEBUG_PRINT_LN(F("Got reset message"));
       resetServos();
+      resetVocalizer();
       digitalWrite(STATUS_LED, HIGH);
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
@@ -870,6 +995,50 @@ void doCommand() {
 
     case 5:
       Scream();
+      break;
+
+    case 6:
+      Leia();
+      break;
+
+    case 7:
+      happyEmote();
+      break;
+
+    case 8:
+      sadEmote();
+      break;
+
+    case 9:
+      madEmote();
+      break;
+
+    case 10:
+      scaredEmote();
+      break;
+
+    case 11:
+      happyEmote(EMOTE_STRONG);
+      break;
+  
+    case 12:
+      sadEmote(EMOTE_STRONG);
+      break;
+
+    case 13:
+      madEmote(EMOTE_STRONG);
+      break;
+
+    case 14:
+      scaredEmote(EMOTE_STRONG);
+      break;
+
+    case 15:
+      overload();
+      break;
+
+    case 16:
+      toggleMute();
       break;
 
     case 21:
