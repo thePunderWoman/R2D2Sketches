@@ -1,0 +1,63 @@
+#START
+xbr=40C8CCB0
+xbl=40C8CCC4
+rvr=1019
+rvl=1014
+s=1,0,180,90,4,0,50,0
+s=2,0,180,90,4,0,50,0
+s=3,0,180,90,4,0,50,0
+s=4,0,180,90,4,0,50,0
+s=5,0,180,90,10,0,50,0
+s=6,0,180,90,10,0,50,0
+volume=50
+startup=y
+rndon=y
+ackon=n
+mindelay=10
+maxdelay=120
+myi2c=0
+rcchn=6
+sb=gen,16
+sb=chat,22
+sb=sad,11
+sb=raspb,1
+sb=whis,12
+sb=scream,4
+sb=warn,2
+sb=short,1
+sb=leia,1
+sb=vader,1
+sb=sw,1
+sb=dance,2
+sb=cant,1
+sb=leial,1
+b=1,1,3
+b=2,1,4
+b=3,1,7
+b=4,1,8
+b=5,1,2
+b=6,1,5
+# Scream
+b=7,4,12,10
+b=8,1,2
+rnd=3
+ack=252
+# Heart
+g=1,4,12,6
+# Pies Open / Close
+g=2,4,12,2
+# Leia
+g=4,4,12,5
+# Reset
+g=5,4,12,1
+# Vader
+g=6,1,10
+# Hello There
+g=7,4,12,7
+# Low Panels Open / Close
+g=8,4,12,3
+# All Panels Open / Close
+g=858,4,12,4
+# Utility Arms Open Close
+g=9,4,9,21
+#END

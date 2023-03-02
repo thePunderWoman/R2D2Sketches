@@ -575,8 +575,7 @@ void scream() {
   sendI2C(REAR_PSI, "5T5\r", false);
   sendI2C(ASTROPIXELS, "@0T4\r", false);
   sendToBody(5);
-  sendI2C(STEALTH, "$02", true); // I2C to Stealth for soundbank 2, chat
-  //TODO: Switch this back to using the proper scream sound bank
+  sendI2C(STEALTH, "$06", true); // I2C to Stealth for soundbank 6, scream
 
   Serial.println("Scream Sequence: Complete");
   i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
