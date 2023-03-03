@@ -566,6 +566,7 @@ void OpenCloseAll () {
 
 void scream() {
   digitalWrite(STATUS_LED, HIGH); // turn on STATUS LED so we can visually see we got the command on the board     
+  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   Serial.print("Scream Sequence: Start");
 
   sendI2C(HPS, "A007C\r", false);
@@ -577,8 +578,15 @@ void scream() {
   sendToBody(5);
   sendI2C(STEALTH, "$06", true); // I2C to Stealth for soundbank 6, scream
 
+  // TODO: Add dome servo animations
+  
+  waitTime(8000); // wait 8 seconds before resetting
+  
+  resetHolos();
+  resetLogics();
+  resetPSIs();
+
   Serial.println("Scream Sequence: Complete");
-  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW); 
 }
 
@@ -590,7 +598,7 @@ void overload() {
   sendI2C(FRONT_PSI, "4T4\r", false);
   sendI2C(REAR_PSI, "5T4\r", false);
   sendI2C(ASTROPIXELS, "@0T4\r", false);
-  sendToBody(11);
+  sendToBody(15);
 
   Serial.println("Overload Sequence: Complete");
   i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
@@ -735,6 +743,15 @@ void resetAll() {
   digitalWrite(STATUS_LED, LOW);
 }
 
+//----------------------------------------------------------------------------
+//  Delay function
+//----------------------------------------------------------------------------
+void waitTime(unsigned long waitTime)
+{
+  unsigned long endTime = millis() + waitTime;
+  while (millis() < endTime)
+  {}// do nothing
+}
     
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

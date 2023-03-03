@@ -26,10 +26,17 @@ float vin = 0.0;        // voltage calculated... since the divider allows for 15
 //Incoming I2C Command
 int I2CCommand = 0;
 
-int voiceVolume = 90;
-int chaVolume = 40;
-int chbVolume = 50;
-bool muted = false;
+#define VOLUME_HIGH 2
+#define VOLUME_LOW 1
+#define VOLUME_MUTE 0
+
+int voiceVolumeHigh = 90;
+int chaVolumeHigh = 50;
+int chbVolumeHigh = 50;
+int voiceVolumeLow = 50;
+int chaVolumeLow = 25;
+int chbVolumeLow = 25;
+int volumeLevel = VOLUME_HIGH; 
 
 unsigned long loopTime; // Time variable
 
@@ -174,7 +181,7 @@ void playSWTheme() {
 // Emote Events
 
 void enableMuse() {
-  HCr.SetMuse(true);
+  HCR.SetMuse(true);
   // sendI2C(30, "<M1>\r", false);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 }
@@ -192,17 +199,28 @@ void resetVocalizer() {
   enableMuse();
 }
 
-void toggleMute() {
-  if (muted) {
-    DEBUG_PRINT_LN(F("UNMUTING"));
-    HCR.SetVolume(CH_V, voiceVolume);
-    HCR.SetVolume(CH_A, chaVolume);
-    muted = false;
-  } else {
-    DEBUG_PRINT_LN(F("MUTING"));
-    HCR.SetVolume(CH_V, 0);
-    HCR.SetVolume(CH_A, 0);
-    muted = true;
+void toggleVolume() {
+  switch (volumeLevel) {
+    case VOLUME_HIGH:
+      DEBUG_PRINT_LN(F("Volume Level: Low"));
+      HCR.SetVolume(CH_V, voiceVolumeLow);
+      HCR.SetVolume(CH_A, chaVolumeLow);
+      volumeLevel = VOLUME_LOW;
+      break;
+
+    case VOLUME_LOW:
+      DEBUG_PRINT_LN(F("Volume Level: Mute"));
+      HCR.SetVolume(CH_V, 0);
+      HCR.SetVolume(CH_A, 0);
+      volumeLevel = VOLUME_MUTE;
+      break;
+
+    case VOLUME_MUTE:
+      DEBUG_PRINT_LN(F("Volume Level: High"));
+      HCR.SetVolume(CH_V, voiceVolumeHigh);
+      HCR.SetVolume(CH_A, chaVolumeHigh);
+      volumeLevel = VOLUME_HIGH;
+      break;
   }
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 }
@@ -233,19 +251,19 @@ void overloadEmote() {
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 }
 
-// TODO: Add double click functionality to make the Emote level strong
-// TODO: Pause emotes while playing
-
 // Events
 void Leia() {
   digitalWrite(STATUS_LED, HIGH);
-
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  
   disableMuse();
   HCR.StopEmote();
+  
   playLeia();
-  waitTime(36000); // wait until Leia is done to re-enable
+  
+  waitTime(40000); // wait 40 seconds
   enableMuse();
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  
   digitalWrite(STATUS_LED, LOW);
 }
 
@@ -961,7 +979,6 @@ void receiveEvent(int howMany) {
 // I2C Command Function
 
 void doCommand() {
-  delay(50);
   loopTime = millis(); 
 
   switch (I2CCommand) {
@@ -975,102 +992,127 @@ void doCommand() {
 
     case 2:
       Vader();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 3:
       Theme();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 4:
       Cantina();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 5:
       Scream();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 6:
       Leia();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 7:
       happyEmote();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 8:
       sadEmote();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 9:
       madEmote();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 10:
       scaredEmote();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 11:
       happyEmote(EMOTE_STRONG);
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
   
     case 12:
       sadEmote(EMOTE_STRONG);
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 13:
       madEmote(EMOTE_STRONG);
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 14:
       scaredEmote(EMOTE_STRONG);
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 15:
       overload();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 16:
-      toggleMute();
+      toggleVolume();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 21:
       UtilityArms();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 22:
       Doors();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 23:
       openLeftDoor();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 24:
       openRightDoor();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 25:
       openEverything();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 26:
       openCBIDoor();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 27:
       openDataDoor();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 28:
       openCBI_DataDoor();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 29:
       TopUtilityArm();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 30:
       BottomUtilityArm();
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     default: // Catch All
