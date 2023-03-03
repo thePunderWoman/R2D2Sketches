@@ -26,8 +26,8 @@ float vin = 0.0;        // voltage calculated... since the divider allows for 15
 //Incoming I2C Command
 int I2CCommand = 0;
 
-int voiceVolume = 99;
-int chaVolume = 50;
+int voiceVolume = 90;
+int chaVolume = 40;
 int chbVolume = 50;
 bool muted = false;
 
@@ -104,10 +104,8 @@ void setup()
   DEBUG_PRINT(F("Activating Servos"));
   resetServos();
   
-  // waitTime(3000);
   HCR.begin();
 
-  // Disable Emotion Override
   resetVocalizer();
   
   DEBUG_PRINT_LN(F("Setup Complete"));
@@ -151,13 +149,14 @@ void loop() {
 //----------------------------------------------------------------------------
 
 void playScream() {
-  HCR.PlayWAV(CH_A, "0010C0011");
+  HCR.Stimulate(SCARED, EMOTE_STRONG);
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 }
 
 void playLeia() {
-  sendI2C(30, "<CA0000>\r", false);
+  HCR.PlayWAV(CH_A, "0000");
+  // sendI2C(30, "<CA0000>\r", false);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
-  // HCR.PlayWAV(CH_A, "0000");
 }
 
 void playVader() {
@@ -175,42 +174,34 @@ void playSWTheme() {
 // Emote Events
 
 void enableMuse() {
-  sendI2C(30, "<PSG,M1,MN10,MX30>\r", false);
+  HCr.SetMuse(true);
+  // sendI2C(30, "<M1>\r", false);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 }
 
 void disableMuse() {
-  sendI2C(30, "<PSG,M0>\r", false);
+  HCR.SetMuse(false);
+  // sendI2C(30, "<M0>\r", false);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 }
 
 void resetVocalizer() {
   DEBUG_PRINT_LN(F("RESETTING VOCALIZER"));
   HCR.ResetEmotions();
-  HCR.StopEmote();
   HCR.StopWAV(CH_A);
-  HCR.StopWAV(CH_B);
-  sendI2C(30, "<PVV99,PVA50,PVB50>\r", false);
-  // toggleMute();
   enableMuse();
-  enableMuse();
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 }
 
 void toggleMute() {
   if (muted) {
     DEBUG_PRINT_LN(F("UNMUTING"));
-    sendI2C(30, "<PVV99,PVA50,PVB50>\r", false);
-    // HCR.SetVolume(CH_V, voiceVolume);
-    // HCR.SetVolume(CH_A, chaVolume);
-    // HCR.SetVolume(CH_B, chbVolume);
+    HCR.SetVolume(CH_V, voiceVolume);
+    HCR.SetVolume(CH_A, chaVolume);
     muted = false;
   } else {
     DEBUG_PRINT_LN(F("MUTING"));
-    sendI2C(30, "<PVV0,PVA0,PVB0>\r", false);
-    // HCR.SetVolume(CH_V, 0);
-    // HCR.SetVolume(CH_A, 0);
-    // HCR.SetVolume(CH_B, 0);
+    HCR.SetVolume(CH_V, 0);
+    HCR.SetVolume(CH_A, 0);
     muted = true;
   }
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
@@ -237,7 +228,8 @@ void scaredEmote(int level = EMOTE_MODERATE) {
 }
 
 void overloadEmote() {
-  sendI2C(30, "<SE>\r", false);
+  HCR.Overload();
+  // sendI2C(30, "<SE>\r", false);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 }
 
