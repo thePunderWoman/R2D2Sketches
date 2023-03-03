@@ -1,13 +1,15 @@
-// CMB Servo Expander Body v 1.7
+// CMB Servo Expander Body v 1.8
 // Based on Work by Chris James (v1.14) 3-10-2017
-// Modified by Chris Bozzoli (DBoz)
+// Based on work by Chris Bozzoli (DBoz) (v1.7)
+// Modified by Jessica Janiuk (thePunderWoman)
 //
-//v1.2 Added Individual Utility Arm Movment 7-10-18
-//v1.3 Replaced all delays with watiTime funciton 4-12-20
+//v1.2 Added Individual Utility Arm Movement 7-10-18
+//v1.3 Replaced all delays with waitTime funciton 4-12-20
 //v1.4 Rearranged Switch/Case Numbers to align with Dome 4-21-20
 //v1.5 Removed Back Door code, renumbered servo pins, Added Open Everything Funciton 5-21-20
 //V1.6 Optimized I2C function 8-20-20
 //V1.7 Integrated CBI_DataPanel_SA_Breakout 1.0 code 2/24/21
+//V1.8 Integrated HCR Vocalizer APIs
 // -------------------------------------------------
 
 //Variable Speed Servo Library with sequencing ability

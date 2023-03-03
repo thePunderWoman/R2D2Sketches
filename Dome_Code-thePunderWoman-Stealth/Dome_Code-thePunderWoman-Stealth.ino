@@ -1,5 +1,3 @@
-
-
 //-----------------------------------------------------------------------------------------------
 // Servo Expander "Dome Stealth Servo Expander" 
 // 
@@ -71,8 +69,8 @@ VarSpeedServo Servos[NBR_SERVOS];
 #define P13 11  // P13   Low Panel  
 // #define P11_P13 11  // P11 & P13  Low Panels  
 
-  //  Servos in open position = 1000ms ( 0 degrees )  
-//  Servos in closed position = 2000ms ( 180 degrees ) 
+  //  Servos in open position = 2000ms ( 180 degrees )  
+//  Servos in closed position = 1100ms ( 0 degrees ) 
 
 #define FIRST_SERVO_PIN 2 //First Arduino Pin for Servos
 
@@ -81,9 +79,9 @@ VarSpeedServo Servos[NBR_SERVOS];
 // #define PANEL_CLOSE 2000   //   (170) 180=close position, 2000 us                        
 // #define PANEL_HALFWAY 1400  // 90=midway point 1500ms, use for animations etc. 
 // #define PANEL_PARTOPEN 1650  //Partially Open, approximately 1/4    
-#define PANEL_OPEN 2000     //  (40)  0=open position, 1000 us                          
-#define PANEL_CLOSE 1100   //   (170) 180=close position, 2000 us                        
-#define PANEL_HALFWAY 1800  // 90=midway point 1500ms, use for animations etc. 
+#define PANEL_OPEN 2000     //  (40)  0=open position, 2000 us                          
+#define PANEL_CLOSE 1100   //   (170) 180=close position, 1100 us                        
+#define PANEL_HALFWAY 1800  // 90=midway point 1800ms, use for animations etc. 
 #define PANEL_PARTOPEN 1450  //Partially Open, approximately 1/4    
 
 #define PANEL_MIN 1100
