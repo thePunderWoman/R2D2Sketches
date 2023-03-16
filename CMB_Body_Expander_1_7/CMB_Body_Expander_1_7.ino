@@ -162,9 +162,12 @@ void playScream() {
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 }
 
+/**
+ * @brief Plays the Leia audio
+ * 
+ */
 void playLeia() {
   HCR.PlayWAV(CH_A, "0000");
-  // sendI2C(30, "<CA0000>\r", false);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 }
 
@@ -183,14 +186,13 @@ void playSWTheme() {
 // Emote Events
 
 void enableMuse() {
-  HCR.SetMuse(true);
-  // sendI2C(30, "<M1>\r", false);
+  HCR.Muse(1,2);
+  HCR.SetMuse(1);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 }
 
 void disableMuse() {
-  HCR.SetMuse(false);
-  // sendI2C(30, "<M0>\r", false);
+  HCR.SetMuse(0);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 }
 
@@ -249,7 +251,6 @@ void scaredEmote(int level = EMOTE_MODERATE) {
 
 void overloadEmote() {
   HCR.Overload();
-  // sendI2C(30, "<SE>\r", false);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 }
 

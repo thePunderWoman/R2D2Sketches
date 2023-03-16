@@ -75,13 +75,10 @@ VarSpeedServo Servos[NBR_SERVOS];
 #define FIRST_SERVO_PIN 2 //First Arduino Pin for Servos
 
 // Dome Panel Open/Close values, can use servo value typically 1000-2000ms or position 0-180 degress. 
-// #define PANEL_OPEN 1100     //  (40)  0=open position, 1000 us                          
-// #define PANEL_CLOSE 2000   //   (170) 180=close position, 2000 us                        
-// #define PANEL_HALFWAY 1400  // 90=midway point 1500ms, use for animations etc. 
-// #define PANEL_PARTOPEN 1650  //Partially Open, approximately 1/4    
 #define PANEL_OPEN 2000     //  (40)  0=open position, 2000 us                          
 #define PANEL_CLOSE 1100   //   (170) 180=close position, 1100 us                        
-#define PANEL_HALFWAY 1800  // 90=midway point 1800ms, use for animations etc. 
+#define PANEL_TINYOPEN 1800  // 90=midway point 1800ms, use for animations etc. 
+#define PANEL_HALFWAY 1625  // 90=midway point 1800ms, use for animations etc. 
 #define PANEL_PARTOPEN 1450  //Partially Open, approximately 1/4    
 
 #define PANEL_MIN 1100
@@ -519,11 +516,11 @@ void OpenCloseAll () {
       for (int i=0; i<2; i++) {   //Loop x number of times, 2 in this case
 
         // P1 & P2 twinkle up and down
-        Servos[P1].write(PANEL_HALFWAY,FASTSPEED,true);
+        Servos[P1].write(PANEL_TINYOPEN,FASTSPEED,true);
         Servos[P1].write(PANEL_OPEN,FASTSPEED);
         delay(80);
         Servos[P2].write(PANEL_OPEN,FASTSPEED,true);
-        Servos[P2].write(PANEL_HALFWAY,FASTSPEED);
+        Servos[P2].write(PANEL_TINYOPEN,FASTSPEED);
         delay(80);
         Servos[P2].write(PANEL_OPEN,FASTSPEED);
         
@@ -531,10 +528,10 @@ void OpenCloseAll () {
         delay(100);
 
         //PP1 & PP6 twinkle up and down
-        Servos[PP2].write(PANEL_HALFWAY,FASTSPEED,true);
+        Servos[PP2].write(PANEL_TINYOPEN,FASTSPEED,true);
         Servos[PP2].write(PANEL_OPEN,FASTSPEED,true);
         delay(80);
-        Servos[PP5].write(PANEL_HALFWAY,FASTSPEED,true);
+        Servos[PP5].write(PANEL_TINYOPEN,FASTSPEED,true);
         Servos[PP5].write(PANEL_OPEN,FASTSPEED,true);
       }   
 
@@ -577,9 +574,133 @@ void scream() {
   sendI2C(STEALTH, "$06", true); // I2C to Stealth for soundbank 6, scream
 
   // TODO: Add dome servo animations
+  Serial.println("Opening");
+  AllOpen=true;
+
+  //  Attach, write servo (min, max) range to ensure each panel opens and closes properly, adjust for your servos
+  Servos[PP1].attach(PP1_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  Servos[PP2].attach(PP2_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  Servos[PP5].attach(PP5_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  Servos[PP6].attach(PP6_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  // Servos[DT].attach(DT_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  Servos[P1].attach(P1_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  Servos[P2].attach(P2_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  Servos[P3].attach(P3_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  Servos[P4].attach(P4_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  Servos[P7].attach(P7_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  Servos[P10].attach(P10_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  Servos[P11].attach(P11_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  Servos[P13].attach(P13_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+
+  //Write Pies open
+  Servos[PP2].write(PANEL_OPEN,SPEED);
+  Servos[PP5].write(PANEL_OPEN,SPEED);
+  Servos[PP1].write(PANEL_OPEN,SPEED);
+  Servos[PP6].write(PANEL_OPEN,SPEED);
   
-  waitTime(8000); // wait 8 seconds before resetting
+  //Write lows
+  Servos[P10].write(PANEL_OPEN,FASTSPEED);
+  Servos[P11].write(PANEL_OPEN,FASTSPEED);
+  Servos[P13].write(PANEL_OPEN,FASTSPEED);
+  Servos[P1].write(PANEL_OPEN,FASTSPEED);
+  Servos[P2].write(PANEL_OPEN,FASTSPEED);
+  Servos[P3].write(PANEL_OPEN,FASTSPEED);
+  Servos[P4].write(PANEL_OPEN,FASTSPEED);
+  Servos[P7].write(PANEL_OPEN,FASTSPEED);
   
+
+  // randomly flutter panels
+  for (int i=0; i<10; i++) {
+    randomSeed(analogRead(0));
+    long randomPanel = random(12);
+    Servos[randomPanel].write(PANEL_HALFWAY,FASTSPEED,true);
+    Servos[randomPanel].write(PANEL_OPEN,FASTSPEED);
+    delay(80);
+    Servos[randomPanel].write(PANEL_HALFWAY,FASTSPEED,true);
+    Servos[randomPanel].write(PANEL_OPEN,FASTSPEED);
+    delay(100);
+  }   
+
+  delay(800);
+
+  // Detach when open     
+  Servos[PP1].detach();
+  Servos[PP2].detach();
+  Servos[PP5].detach();
+  Servos[PP6].detach();
+  // Servos[DT].detach();
+  Servos[P1].detach();
+  Servos[P2].detach();
+  Servos[P3].detach();
+  Servos[P4].detach();
+  Servos[P7].detach();
+  Servos[P10].detach();
+  Servos[P11].detach();
+  Servos[P13].detach();
+  
+  Serial.println("Opened All Dome");
+
+
+  waitTime(2000); // wait 8 seconds before resetting
+
+  Serial.println("Closing");
+  AllOpen=false;     
+
+  sendToBody(7); // Play happy vocalization
+  sendI2C(STEALTH, "$02", true); // I2C to Stealth for soundbank 2, chat
+
+  //  Attach, write servo (min, max) range to ensure each panel opens and closes properly 
+
+  Servos[PP1].attach(PP1_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  Servos[PP2].attach(PP2_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  Servos[PP5].attach(PP5_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  Servos[PP6].attach(PP6_SERVO_PIN,PANEL_MIN,PANEL_MAX);
+  Servos[P1].attach(P1_SERVO_PIN);
+  Servos[P2].attach(P2_SERVO_PIN);
+  Servos[P3].attach(P3_SERVO_PIN);
+  Servos[P4].attach(P4_SERVO_PIN);
+  Servos[P7].attach(P7_SERVO_PIN);
+  Servos[P10].attach(P10_SERVO_PIN);
+  Servos[P11].attach(P11_SERVO_PIN);
+  Servos[P13].attach(P13_SERVO_PIN);
+
+  // Write pies to close
+
+  Servos[PP2].write(PANEL_CLOSE,SPEED);
+  Servos[PP6].write(PANEL_CLOSE,SPEED);
+  Servos[PP5].write(PANEL_CLOSE,SPEED);
+  Servos[PP1].write(PANEL_CLOSE,SPEED);
+  
+  //Write low panels to close
+  Servos[P10].write(PANEL_CLOSE,SPEED);
+  Servos[P7].write(PANEL_CLOSE,SPEED);
+  Servos[P4].write(PANEL_CLOSE,SPEED);
+  Servos[P3].write(PANEL_CLOSE,SPEED);
+  Servos[P2].write(PANEL_CLOSE,SPEED);
+  Servos[P1].write(PANEL_CLOSE,SPEED);
+  Servos[P11].write(PANEL_CLOSE,SPEED);
+  Servos[P13].write(PANEL_CLOSE,SPEED);
+
+  delay(500);
+
+  // Detach ALL after close     
+
+  Servos[PP1].detach();
+  Servos[PP2].detach();
+  Servos[PP5].detach();
+  Servos[PP6].detach();
+  // Servos[DT].detach();
+  Servos[P1].detach();
+  Servos[P2].detach();
+  Servos[P3].detach();
+  Servos[P4].detach();
+  Servos[P7].detach();
+  Servos[P10].detach();
+  Servos[P11].detach();
+  Servos[P13].detach();
+
+  Serial.println("Closed All Dome");  
+
   resetHolos();
   resetLogics();
   resetPSIs();
