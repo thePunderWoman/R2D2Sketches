@@ -162,6 +162,7 @@ void receiveEvent(int howMany) {
   i2cCommand = Wire.read();    // receive i2c command
   Serial.print("Command Code:");
   Serial.println(i2cCommand);
+  // runCommand(cmd);
 }
 
 
@@ -175,6 +176,7 @@ void receiveEvent(int howMany) {
 // Open/Close Pie Panels////////////////////////////////////////////////////////////////////////////////////////
 
 void OpenClosePies() {  // Note: This may seem backwards but the Close command ("if") is first and then the Open ("else")second, see Arduino reference guide
+    i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
 
     digitalWrite(STATUS_LED, HIGH); // turn on STATUS LED so we can visually see we got the command on the board     
     //Open or close  All Pie Panels, each command will trigger an open or close command
@@ -195,7 +197,7 @@ void OpenClosePies() {  // Note: This may seem backwards but the Close command (
       // Servos[DT].attach(DT_SERVO_PIN,PANEL_MIN,PANEL_MAX);
 
       sendToBody(7); // Play happy vocalization
-      sendI2C(STEALTH, "$02", true); // sends an I2C command to Stealth folder two (chat sounds)
+      // sendI2C(STEALTH, "$02", true); // sends an I2C command to Stealth folder two (chat sounds)
 
       //closes panels, "true" statement allows servo to reach position before executing next .write
       Servos[PP1].write(PANEL_CLOSE,SPEED,true); // the "true" uses servo postion to ensure full position prior to next .write line. Good for smooth sequence verses delays
@@ -228,7 +230,7 @@ void OpenClosePies() {  // Note: This may seem backwards but the Close command (
       // Servos[DT].attach(DT_SERVO_PIN,PANEL_MIN,PANEL_MAX);
 
       sendToBody(7); // Play happy vocalization
-      sendI2C(STEALTH, "$01", true);  // Stealth sound folder one (general sounds)
+      // sendI2C(STEALTH, "$01", true);  // Stealth sound folder one (general sounds)
 
       for (int i=0; i<2; i++) { 
         // open pies in wave
@@ -268,7 +270,6 @@ void OpenClosePies() {  // Note: This may seem backwards but the Close command (
     }
     // end "for" loop
     
-    i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
     digitalWrite(STATUS_LED, LOW);
 }
 
@@ -276,6 +277,7 @@ void OpenClosePies() {  // Note: This may seem backwards but the Close command (
 // Open/Close Low panels///////////////////////////////////////////////////////////////////////////////////
 
 void OpenCloseLow() { 
+    i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
 
     digitalWrite(STATUS_LED, HIGH); // turn on STATUS LED so we can visually see we got the command on the board     
    
@@ -299,7 +301,7 @@ void OpenCloseLow() {
       Servos[P13].attach(P13_SERVO_PIN,PANEL_MIN,PANEL_MAX);
 
       sendToBody(7); // Play happy vocalization
-      sendI2C(STEALTH, "$02", true); //plays random sound in specified soundbank folder 
+      // sendI2C(STEALTH, "$02", true); //plays random sound in specified soundbank folder 
 
       Servos[P4].write(PANEL_CLOSE,SPEED,true);
       Servos[P2].write(PANEL_CLOSE,SPEED,true);
@@ -342,7 +344,7 @@ void OpenCloseLow() {
       Servos[P13].attach(P13_SERVO_PIN);
       
       sendToBody(7); // Play happy vocalization
-      sendI2C(STEALTH, "$02", true); //plays random sound in specified soundbank folder 
+      // sendI2C(STEALTH, "$02", true); //plays random sound in specified soundbank folder 
 
        // Wave these panels in order specified below using "for" loop to repeat
       for (int i=0; i<2; i++) { 
@@ -397,13 +399,13 @@ void OpenCloseLow() {
       
       Serial.println("Lows Opened");
     }
-    i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
     digitalWrite(STATUS_LED, LOW);
 }
 
 //Open/Close All Panels////////////////////////////////////////////////////////////////////////////////////////////
 
 void OpenCloseAll () {
+    i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
 
     digitalWrite(STATUS_LED, HIGH); // turn on STATUS LED so we can visually see we got the command on the board     
     //Open or close  All Panels
@@ -415,7 +417,7 @@ void OpenCloseAll () {
       AllOpen=false;     
 
       sendToBody(7); // Play happy vocalization
-      sendI2C(STEALTH, "$02", true); // I2C to Stealth for soundbank 2, chat
+      // sendI2C(STEALTH, "$02", true); // I2C to Stealth for soundbank 2, chat
 
       //  Attach, write servo (min, max) range to ensure each panel opens and closes properly 
 
@@ -492,7 +494,7 @@ void OpenCloseAll () {
       Servos[P13].attach(P13_SERVO_PIN,PANEL_MIN,PANEL_MAX);
 
       sendToBody(7);
-      sendI2C(STEALTH, "$02", true); // I2C to Stealth for soundbank 2, chat
+      // sendI2C(STEALTH, "$02", true); // I2C to Stealth for soundbank 2, chat
 
       //Write Pies open
       Servos[PP2].write(PANEL_OPEN,SPEED,true);
@@ -555,13 +557,12 @@ void OpenCloseAll () {
       
       Serial.println("Opened All Dome");
     }
-    i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
     digitalWrite(STATUS_LED, LOW);
 }
 
 void scream() {
-  digitalWrite(STATUS_LED, HIGH); // turn on STATUS LED so we can visually see we got the command on the board     
   i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
+  digitalWrite(STATUS_LED, HIGH); // turn on STATUS LED so we can visually see we got the command on the board     
   Serial.print("Scream Sequence: Start");
 
   sendI2C(HPS, "A007C\r", false);
@@ -571,7 +572,7 @@ void scream() {
   sendI2C(REAR_PSI, "5T5\r", false);
   sendI2C(ASTROPIXELS, "@0T4\r", false);
   sendToBody(5);
-  sendI2C(STEALTH, "$06", true); // I2C to Stealth for soundbank 6, scream
+  // sendI2C(STEALTH, "$06", true); // I2C to Stealth for soundbank 6, scream
 
   // TODO: Add dome servo animations
   Serial.println("Opening");
@@ -647,7 +648,7 @@ void scream() {
   AllOpen=false;     
 
   sendToBody(7); // Play happy vocalization
-  sendI2C(STEALTH, "$02", true); // I2C to Stealth for soundbank 2, chat
+  // sendI2C(STEALTH, "$02", true); // I2C to Stealth for soundbank 2, chat
 
   //  Attach, write servo (min, max) range to ensure each panel opens and closes properly 
 
@@ -710,6 +711,7 @@ void scream() {
 }
 
 void overload() {
+  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, HIGH); // turn on STATUS LED so we can visually see we got the command on the board     
   Serial.print("Overload Sequence: Start");
 
@@ -720,11 +722,11 @@ void overload() {
   sendToBody(15);
 
   Serial.println("Overload Sequence: Complete");
-  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW); 
 }
 
 void heart() {
+  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, HIGH); // turn on STATUS LED so we can visually see we got the command on the board     
   Serial.print("Heart: Start");
 
@@ -733,23 +735,23 @@ void heart() {
   sendI2C(ASTROPIXELS, "@1MYou're\rWonderful", false);
 
   Serial.println("Heart: Complete");
-  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
 }
 
 void helloThere() {
+  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, HIGH); // turn on STATUS LED so we can visually see we got the command on the board     
   Serial.print("Hello There: Start");
 
   sendI2C(ASTROPIXELS, "@1MHello\rThere", false);
 
   Serial.println("Hello There: Complete");
-  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW); 
 }
 
 // Trigger the Leia sequence
 void leiaMode() {
+  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, HIGH); // turn on STATUS LED so we can visually see we got the command on the board     
   Serial.print("Leia Sequence: Start");
 
@@ -758,36 +760,44 @@ void leiaMode() {
   sendI2C(REAR_PSI, "5T6|36\r", false);
   sendI2C(ASTROPIXELS, "@0T6\r", false);
   sendToBody(6);
-  sendI2C(STEALTH, "$14", true); // play Leia Long sequence
-  sendI2C(STEALTH, "tmprnd=40", true); // temporarily disable random sounds
+  // sendI2C(STEALTH, "$14", true); // play Leia Long sequence
+  // sendI2C(STEALTH, "tmprnd=40", true); // temporarily disable random sounds
   delay(500);
 
   Serial.println("Leia Sequence: Complete");
+  digitalWrite(STATUS_LED, LOW);
+}
+
+void toggleMuse() {
   i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
+  digitalWrite(STATUS_LED, HIGH); // turn on STATUS LED so we can visually see we got the command on the board     
+  Serial.print("Toggling muse");
+  sendToBody(31);
   digitalWrite(STATUS_LED, LOW);
 }
 
 void resetHolos() {
+  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   sendI2C(HPS, "S9\r", false);
   Serial.print("Holo Projectors reset");
-  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
 }
 
 void resetLogics() {
+  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   sendI2C(ASTROPIXELS, "@0T1\r", false);
   Serial.print("Astropixels reset");
-  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
 }
 
 void resetPSIs() {
+  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   // Send I2C command to front PSI
   sendI2C(FRONT_PSI, "4T1\r", false);
   sendI2C(REAR_PSI, "5T1\r", false);
   Serial.print("PSI Pros reset");
-  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
 }
 
 void resetBody() {
+  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   sendToBody(1);
   Serial.print("Body controller reset");
 }
@@ -795,6 +805,7 @@ void resetBody() {
 //RESET SERVOS, HOLOS, MAGIC PANEL  ================================================================================================
 
 void resetAll() {
+  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
 
   digitalWrite(STATUS_LED, HIGH); // turn on STATUS LED so we can visually see we got the command on the board 
 
@@ -858,7 +869,6 @@ void resetAll() {
   resetPSIs();
   resetBody();
 
-  i2cCommand=-1; // always reset i2cCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
 }
 
@@ -871,23 +881,11 @@ void waitTime(unsigned long waitTime)
   while (millis() < endTime)
   {}// do nothing
 }
-    
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/////Main Loop////////////
-
-//  Use Stealth Config.txt file on USB to trigger I2C and specific "Switch/Case" below for routine. See Stealth Manual for config info
-//  Example for Stealth: Button: b=1,4,10,2 (Button One, I2C, Expander Address 10, Case 2 (OpenClose Pies))
-//  Example for Stealth: Gesture: g=2,4,10,4 (Gesture Up once, I2C, Expander Address 10, Case 4 (OpenCloseAll))
-
-void loop() {
-
-  delay(50);
-  loopTime = millis(); 
-  
-
+void runCommand(int cmd)
+{
  // Check for new i2c command
-  switch(i2cCommand) {
+  switch(cmd) {
     
    case 1: // RESET can be triggered also using this case number, will reset and close see above 
           resetAll();
@@ -921,11 +919,35 @@ void loop() {
           scream();
           break;
 
-  default: // Catch All
-    case 0: 
-          digitalWrite(STATUS_LED, LOW);
-          i2cCommand=-1;    
+   case 11:
+          toggleMuse();
           break;
+
+  default: // Catch All
+   case 0:
+        digitalWrite(STATUS_LED, LOW);
+        break;
+  }  
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/////Main Loop////////////
+
+//  Use Stealth Config.txt file on USB to trigger I2C and specific "Switch/Case" below for routine. See Stealth Manual for config info
+//  Example for Stealth: Button: b=1,4,10,2 (Button One, I2C, Expander Address 10, Case 2 (OpenClose Pies))
+//  Example for Stealth: Gesture: g=2,4,10,4 (Gesture Up once, I2C, Expander Address 10, Case 4 (OpenCloseAll))
+
+void loop() {
+
+  delay(50);
+  loopTime = millis();
+  if (i2cCommand > -1) {
+    int temp = i2cCommand;
+    i2cCommand = -1;
+    runCommand(temp);
+    temp = -1;
   }
- 
+
+  i2cCommand=-1;
 }

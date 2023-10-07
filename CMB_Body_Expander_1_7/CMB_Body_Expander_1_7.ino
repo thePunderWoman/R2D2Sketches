@@ -39,6 +39,7 @@ int voiceVolumeLow = 50;
 int chaVolumeLow = 25;
 int chbVolumeLow = 25;
 int volumeLevel = VOLUME_HIGH; 
+bool muse = false;
 
 unsigned long loopTime; // Time variable
 
@@ -186,14 +187,16 @@ void playSWTheme() {
 // Emote Events
 
 void enableMuse() {
-  HCR.Muse(1,2);
-  HCR.SetMuse(1);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  HCR.Muse(20,45);
+  HCR.SetMuse(1);
+  muse = true;
 }
 
 void disableMuse() {
-  HCR.SetMuse(0);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  HCR.SetMuse(0);
+  muse = false;
 }
 
 void resetVocalizer() {
@@ -203,7 +206,16 @@ void resetVocalizer() {
   enableMuse();
 }
 
+void toggleMuse() {
+  if (muse) {
+    disableMuse();
+  } else {
+    enableMuse();
+  }
+}
+
 void toggleVolume() {
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   switch (volumeLevel) {
     case VOLUME_HIGH:
       DEBUG_PRINT_LN(F("Volume Level: Low"));
@@ -226,38 +238,37 @@ void toggleVolume() {
       volumeLevel = VOLUME_HIGH;
       break;
   }
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 }
 
 void sadEmote(int level = EMOTE_MODERATE) {
-  HCR.Stimulate(SAD, level);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  HCR.Stimulate(SAD, level);
 }
 
 void happyEmote(int level = EMOTE_MODERATE) {
-  HCR.Stimulate(HAPPY, level);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  HCR.Stimulate(HAPPY, level);
 }
 
 void madEmote(int level = EMOTE_MODERATE) {
-  HCR.Stimulate(MAD, level);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  HCR.Stimulate(MAD, level);
 }
 
 void scaredEmote(int level = EMOTE_MODERATE) {
-  HCR.Stimulate(SCARED, level);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  HCR.Stimulate(SCARED, level);
 }
 
 void overloadEmote() {
-  HCR.Overload();
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  HCR.Overload();
 }
 
 // Events
 void Leia() {
-  digitalWrite(STATUS_LED, HIGH);
   I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+  digitalWrite(STATUS_LED, HIGH);
   
   disableMuse();
   HCR.StopEmote();
@@ -271,35 +282,35 @@ void Leia() {
 }
 
 void Vader() {
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, HIGH);
 
   playVader();
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
 }
 
 void Theme() {
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, HIGH);
 
   playSWTheme();
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
 }
 
 void Cantina() {
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, HIGH);
 
   playCantina();
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
 }
 
 void overload() {
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, HIGH);
   // TODO: add servo functionality
 
   overloadEmote();
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
 }
 
@@ -312,6 +323,7 @@ void overload() {
 //-----------------------------------------------------
 
 void resetServos() {
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 
   Servos[TOP_UTIL_ARM].attach(TOP_UTIL_ARM_SERVO_PIN, ARMMINPULSE, ARMMAXPULSE);
   Servos[TOP_UTIL_ARM].write(TOP_ARM_CLOSE, UTILITYARMSSPEED3);
@@ -360,6 +372,7 @@ void resetServos() {
 //-----------------------------------------------------
 
 void openEverything() {
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 
   digitalWrite(STATUS_LED, HIGH);
 
@@ -411,13 +424,13 @@ void openEverything() {
     bottomUtilityArmOpen = true;
   }
 
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
 }
 
 //------------------------------------------------------------------
 // Open/Close both Utility Arms
 void UtilityArms() {
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 
   digitalWrite(STATUS_LED, HIGH);
 
@@ -488,13 +501,13 @@ void UtilityArms() {
     Servos[BOTTOM_UTIL_ARM].detach();
   }
 
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
 }
 
 //------------------------------------------------------------------
 // Open/Close Top Utility Arm
 void TopUtilityArm() {
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 
   digitalWrite(STATUS_LED, HIGH);
 
@@ -541,13 +554,13 @@ void TopUtilityArm() {
 
   }
 
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
 }
 
 //------------------------------------------------------------------
 // Open/Close Bottom Utility Arm
 void BottomUtilityArm() {
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 
   digitalWrite(STATUS_LED, HIGH);
 
@@ -594,7 +607,6 @@ void BottomUtilityArm() {
 
   }
 
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
 }
 
@@ -602,6 +614,7 @@ void BottomUtilityArm() {
 // S C R E A M
 //---------------------------------------------
 void Scream() {
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 
   digitalWrite(STATUS_LED, HIGH);
 
@@ -669,7 +682,6 @@ void Scream() {
   Servos[TOP_UTIL_ARM].detach();
   Servos[BOTTOM_UTIL_ARM].detach();
 
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
 }
 
@@ -678,6 +690,7 @@ void Scream() {
 //-----------------------------------------------------
 
 void Doors() {
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 
   digitalWrite(STATUS_LED, HIGH);
 
@@ -750,13 +763,11 @@ void Doors() {
 
   }
 
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
-
-
 }
 
 void openLeftDoor() {
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
 
   digitalWrite(STATUS_LED, HIGH);
 
@@ -777,13 +788,11 @@ void openLeftDoor() {
     Servos[LEFT_DOOR].detach();
   }
 
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
-
 }
 
 void openRightDoor() {
-
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, HIGH);
 
   if (rightDoorOpen) {
@@ -803,13 +812,11 @@ void openRightDoor() {
     Servos[RIGHT_DOOR].detach();
   }
 
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
-
 }
 
 void openCBIDoor() {
-
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, HIGH);
 
   if (cbiDoorOpen) {
@@ -835,13 +842,11 @@ void openCBIDoor() {
     Servos[CBI_DOOR].detach();
   }
 
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
-
 }
 
 void openDataDoor() {
-
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, HIGH);
 
   if (dataDoorOpen) {
@@ -869,13 +874,11 @@ void openDataDoor() {
     Servos[DATA_DOOR].detach();
   }
 
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
-
 }
 
 void openCBI_DataDoor() {
-
+  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, HIGH);
 
   //if doors were opened individually, cbi_dataOpen is true
@@ -918,9 +921,7 @@ void openCBI_DataDoor() {
     Servos[DATA_DOOR].detach();
   }
 
-  I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
   digitalWrite(STATUS_LED, LOW);
-
 }
 
 //----------------------------------------------------------------------------
@@ -986,142 +987,148 @@ void doCommand() {
 
   switch (I2CCommand) {
     case 1: // RESET
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       DEBUG_PRINT_LN(F("Got reset message"));
       resetServos();
       resetVocalizer();
       digitalWrite(STATUS_LED, HIGH);
-      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
       break;
 
     case 2:
-      Vader();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      Vader();
       break;
 
     case 3:
-      Theme();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      Theme();
       break;
 
     case 4:
-      Cantina();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      Cantina();
       break;
 
     case 5:
-      Scream();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      Scream();
       break;
 
     case 6:
-      Leia();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      Leia();
       break;
 
     case 7:
-      happyEmote();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      happyEmote();
       break;
 
     case 8:
-      sadEmote();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      sadEmote();
       break;
 
     case 9:
-      madEmote();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      madEmote();
       break;
 
     case 10:
-      scaredEmote();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      scaredEmote();
       break;
 
     case 11:
-      happyEmote(EMOTE_STRONG);
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      happyEmote(EMOTE_STRONG);
       break;
   
     case 12:
-      sadEmote(EMOTE_STRONG);
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      sadEmote(EMOTE_STRONG);
       break;
 
     case 13:
-      madEmote(EMOTE_STRONG);
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      madEmote(EMOTE_STRONG);
       break;
 
     case 14:
-      scaredEmote(EMOTE_STRONG);
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      scaredEmote(EMOTE_STRONG);
       break;
 
     case 15:
-      overload();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      overload();
       break;
 
     case 16:
-      toggleVolume();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      toggleVolume();
       break;
 
     case 21:
-      UtilityArms();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      UtilityArms();
       break;
 
     case 22:
-      Doors();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      Doors();
       break;
 
     case 23:
-      openLeftDoor();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      openLeftDoor();
       break;
 
     case 24:
-      openRightDoor();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      openRightDoor();
       break;
 
     case 25:
-      openEverything();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      openEverything();
       break;
 
     case 26:
-      openCBIDoor();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      openCBIDoor();
       break;
 
     case 27:
-      openDataDoor();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      openDataDoor();
       break;
 
     case 28:
-      openCBI_DataDoor();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      openCBI_DataDoor();
       break;
 
     case 29:
-      TopUtilityArm();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      TopUtilityArm();
       break;
 
     case 30:
-      BottomUtilityArm();
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      BottomUtilityArm();
+      break;
+
+    case 31: // MUSE
+      I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      toggleMuse();
+      digitalWrite(STATUS_LED, HIGH);
       break;
 
     default: // Catch All
     case 0:
-      digitalWrite(STATUS_LED, LOW);
       I2CCommand = -1; // always reset I2CCommand to -1, so we don't repeatedly do the same command
+      digitalWrite(STATUS_LED, LOW);
       break;
   }
 }
